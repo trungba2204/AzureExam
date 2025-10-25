@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
-using Microsoft.Data.SqlClient;
+using MySql.Data.MySqlClient;
 using Newtonsoft.Json;
 using BattleGameFunctions.Models;
 using BattleGameFunctions.Helpers;
@@ -79,7 +79,7 @@ namespace BattleGameFunctions.Functions
                 }
 
                 // Get connection string from environment
-                var connectionString = Environment.GetEnvironmentVariable("SqlConnectionString");
+                var connectionString = Environment.GetEnvironmentVariable("MySqlConnectionString");
                 if (string.IsNullOrEmpty(connectionString))
                 {
                     return await CreateErrorResponse(req, HttpStatusCode.InternalServerError, 
@@ -90,11 +90,11 @@ namespace BattleGameFunctions.Functions
                 var dbHelper = new DatabaseHelper(connectionString, _logger);
                 var parameters = new[]
                 {
-                    new SqlParameter("@PlayerName", registerRequest.PlayerName),
-                    new SqlParameter("@FullName", registerRequest.FullName),
-                    new SqlParameter("@Age", registerRequest.Age),
-                    new SqlParameter("@Level", registerRequest.Level),
-                    new SqlParameter("@Email", registerRequest.Email)
+                    new MySqlParameter("p_PlayerName", registerRequest.PlayerName),
+                    new MySqlParameter("p_FullName", registerRequest.FullName),
+                    new MySqlParameter("p_Age", registerRequest.Age),
+                    new MySqlParameter("p_Level", registerRequest.Level),
+                    new MySqlParameter("p_Email", registerRequest.Email)
                 };
 
                 var results = dbHelper.ExecuteStoredProcedure("sp_RegisterPlayer", parameters);
@@ -150,4 +150,3 @@ namespace BattleGameFunctions.Functions
         }
     }
 }
-

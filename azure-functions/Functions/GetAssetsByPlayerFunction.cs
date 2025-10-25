@@ -36,7 +36,7 @@ namespace BattleGameFunctions.Functions
             try
             {
                 // Get connection string from environment
-                var connectionString = Environment.GetEnvironmentVariable("SqlConnectionString");
+                var connectionString = Environment.GetEnvironmentVariable("MySqlConnectionString");
                 if (string.IsNullOrEmpty(connectionString))
                 {
                     return await CreateErrorResponse(req, HttpStatusCode.InternalServerError, 
@@ -102,4 +102,3 @@ namespace BattleGameFunctions.Functions
         }
     }
 }
-

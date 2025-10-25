@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
-using Microsoft.Data.SqlClient;
+using MySql.Data.MySqlClient;
 using Newtonsoft.Json;
 using BattleGameFunctions.Models;
 using BattleGameFunctions.Helpers;
@@ -60,7 +60,7 @@ namespace BattleGameFunctions.Functions
                 }
 
                 // Get connection string from environment
-                var connectionString = Environment.GetEnvironmentVariable("SqlConnectionString");
+                var connectionString = Environment.GetEnvironmentVariable("MySqlConnectionString");
                 if (string.IsNullOrEmpty(connectionString))
                 {
                     return await CreateErrorResponse(req, HttpStatusCode.InternalServerError, 
@@ -71,8 +71,8 @@ namespace BattleGameFunctions.Functions
                 var dbHelper = new DatabaseHelper(connectionString, _logger);
                 var parameters = new[]
                 {
-                    new SqlParameter("@AssetName", createRequest.AssetName),
-                    new SqlParameter("@LevelRequire", createRequest.LevelRequire)
+                    new MySqlParameter("p_AssetName", createRequest.AssetName),
+                    new MySqlParameter("p_LevelRequire", createRequest.LevelRequire)
                 };
 
                 var results = dbHelper.ExecuteStoredProcedure("sp_CreateAsset", parameters);
@@ -128,4 +128,3 @@ namespace BattleGameFunctions.Functions
         }
     }
 }
-

@@ -55,17 +55,13 @@
               "target": "Package",
               "version": "[1.16.4, )"
             },
-            "Microsoft.Data.SqlClient": {
+            "MySql.Data": {
               "target": "Package",
-              "version": "[5.1.2, )"
+              "version": "[8.2.0, )"
             },
             "Newtonsoft.Json": {
               "target": "Package",
               "version": "[13.0.3, )"
-            },
-            "System.Data.SqlClient": {
-              "target": "Package",
-              "version": "[4.8.5, )"
             }
           },
           "imports": [

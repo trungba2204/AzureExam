@@ -1,13 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
-using Microsoft.Data.SqlClient;
+using MySql.Data.MySqlClient;
 using Microsoft.Extensions.Logging;
 
 namespace BattleGameFunctions.Helpers
 {
     /// <summary>
-    /// Database helper class for SQL Server operations
+    /// Database helper class for MySQL operations
     /// </summary>
     public class DatabaseHelper
     {
@@ -25,14 +25,14 @@ namespace BattleGameFunctions.Helpers
         /// </summary>
         public List<Dictionary<string, object>> ExecuteStoredProcedure(
             string procedureName, 
-            params SqlParameter[] parameters)
+            params MySqlParameter[] parameters)
         {
             var results = new List<Dictionary<string, object>>();
 
             try
             {
-                using var connection = new SqlConnection(_connectionString);
-                using var command = new SqlCommand(procedureName, connection)
+                using var connection = new MySqlConnection(_connectionString);
+                using var command = new MySqlCommand(procedureName, connection)
                 {
                     CommandType = CommandType.StoredProcedure
                 };
@@ -67,12 +67,12 @@ namespace BattleGameFunctions.Helpers
         /// <summary>
         /// Execute a non-query stored procedure
         /// </summary>
-        public int ExecuteNonQuery(string procedureName, params SqlParameter[] parameters)
+        public int ExecuteNonQuery(string procedureName, params MySqlParameter[] parameters)
         {
             try
             {
-                using var connection = new SqlConnection(_connectionString);
-                using var command = new SqlCommand(procedureName, connection)
+                using var connection = new MySqlConnection(_connectionString);
+                using var command = new MySqlCommand(procedureName, connection)
                 {
                     CommandType = CommandType.StoredProcedure
                 };
@@ -105,7 +105,28 @@ namespace BattleGameFunctions.Helpers
                 var property = type.GetProperty(kvp.Key);
                 if (property != null && kvp.Value != null)
                 {
-                    property.SetValue(obj, Convert.ChangeType(kvp.Value, property.PropertyType));
+                    try
+                    {
+                        var value = kvp.Value;
+                        
+                        // Handle Guid conversion from string
+                        if (property.PropertyType == typeof(Guid) && value is string strValue)
+                        {
+                            value = Guid.Parse(strValue);
+                        }
+                        // Handle type conversion
+                        else if (property.PropertyType != value.GetType())
+                        {
+                            value = Convert.ChangeType(value, property.PropertyType);
+                        }
+                        
+                        property.SetValue(obj, value);
+                    }
+                    catch (Exception)
+                    {
+                        // Skip if conversion fails
+                        continue;
+                    }
                 }
             }
 
@@ -113,4 +134,3 @@ namespace BattleGameFunctions.Helpers
         }
     }
 }
-
